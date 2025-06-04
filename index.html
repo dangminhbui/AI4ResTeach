@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pademy - Tổng quan Nghiên cứu Khoa học</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Scholarly Blue -->
+    <!-- Application Structure Plan: Ứng dụng được cấu trúc lại với các mục chính rõ ràng hơn, bám sát nội dung người dùng cung cấp. Thanh điều hướng bên cập nhật các mục mới, loại bỏ icon. Mỗi mục chính sẽ có phần giới thiệu và nội dung chi tiết được trình bày bằng text, danh sách, và các thành phần tương tác như accordion, card, layout cột để người dùng có thể khám phá từng phần nhỏ một cách trực quan hơn. Thêm thanh điều hướng cuối trang cho mỗi mục. Thêm mục "Đăng ký khóa học" với thông tin liên hệ và link mạng xã hội. -->
+    <!-- Visualization & Content Choices: 
+        - Mục tiêu: Sắp xếp & Thông báo. Phương pháp: Sử dụng các khối văn bản, tiêu đề, danh sách có cấu trúc. Các mục con được nhóm trong accordion hoặc card để tăng tính tương tác và gọn gàng.
+        - Mục tiêu: So sánh & Phân loại (Ba loại nhan đề). Phương pháp: Giữ nguyên cơ chế nút bấm tương tác.
+        - Mục tiêu: Hiển thị Quy trình (Trong "văn phòng" tập san). Phương pháp: Giữ nguyên dạng timeline trực quan.
+        - Mục tiêu: Điều hướng dễ dàng. Phương pháp: Thêm nút "Trang trước", "Trang sau" ở cuối mỗi section.
+        - Mục tiêu: Kêu gọi hành động. Phương pháp: Tạo section "Đăng ký khóa học" nổi bật.
+        - Toàn bộ ứng dụng được xây dựng mà không sử dụng SVG hay MermaidJS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-link.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #f0f9ff; /* sky-50 */
+            color: #0369a1; /* sky-700 */
+        }
+        .content-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .content-section.active {
+            display: block;
+            opacity: 1;
+        }
+        .pademy-logo {
+            max-height: 40px; 
+            width: auto;
+            object-fit: contain;
+        }
+        .contact-info {
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+        .accordion-item .accordion-header {
+            /* Styles applied via JS */
+        }
+        .accordion-item .accordion-content {
+             /* Styles applied via JS */
+        }
+        .accordion-item .accordion-content ul {
+            list-style-type: disc;
+            padding-left: 1.25rem; /* pl-5 */
+            color: #475569; /* slate-600 */
+            font-size: 0.875rem; /* text-sm */
+        }
+        .accordion-item .accordion-content ul li {
+            margin-bottom: 0.25rem; /* mb-1 */
+        }
+        .accordion-item .accordion-content ul strong {
+            color: #1e293b; /* slate-800 */
+        }
+        .section-intro {
+            font-size: 1rem;
+            color: #334155; /* slate-700 */
+            margin-bottom: 2rem; /* mb-8 */
+            line-height: 1.6;
+        }
+        .sub-section-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #0c4a6e; /* sky-800 */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); /* shadow-md */
+            margin-bottom: 1.5rem; /* mb-6 */
+            overflow: hidden; /* To ensure rounded corners with child elements */
+        }
+        .accordion-item.card .accordion-header {
+            padding: 1.25rem 1.5rem; /* p-5 px-6 */
+            border-bottom: 1px solid #e2e8f0; /* border-slate-200 */
+        }
+         .accordion-item.card .accordion-header.no-border { /* For accordions where content is initially hidden */
+            border-bottom: none;
+        }
+        .accordion-item.card .accordion-content {
+            padding: 1.25rem 1.5rem; /* p-5 px-6 */
+            background-color: #f8fafc; /* slate-50 for content area */
+        }
+        .bottom-nav-button {
+            background-color: #0ea5e9; /* sky-500 */
+            color: white;
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 500; /* font-medium */
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .bottom-nav-button:hover {
+            background-color: #0284c7; /* sky-600 */
+        }
+        .bottom-nav-button:disabled {
+            background-color: #94a3b8; /* slate-400 */
+            cursor: not-allowed;
+        }
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease;
+            font-size: 0.875rem;
+        }
+        .facebook-link {
+            background-color: #1877F2; color: white;
+        }
+        .facebook-link:hover {
+            background-color: #166FE5;
+        }
+        .youtube-link {
+            background-color: #FF0000; color: white;
+        }
+        .youtube-link:hover {
+            background-color: #CC0000;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2.5rem; /* pl-10 */
+            padding-bottom: 1.5rem; /* pb-6 */
+            border-left: 2px solid #38bdf8; /* sky-400 */
+        }
+        .timeline-item:last-child {
+            border-left: 2px solid transparent; /* Hide line for last item */
+            padding-bottom: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -0.5625rem; /* Adjust to center on the line */
+            top: 0.125rem; /* Adjust vertical alignment */
+            height: 1.125rem; /* h-4.5 */
+            width: 1.125rem; /* w-4.5 */
+            background-color: #0284c7; /* sky-600 */
+            border-radius: 9999px; /* rounded-full */
+            border: 2px solid white;
+        }
+        .info-card {
+            background-color: #f0f9ff; /* sky-50 */
+            border-left: 4px solid #0ea5e9; /* sky-500 */
+            padding: 1rem; /* p-4 */
+            border-radius: 0.375rem; /* rounded-md */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .info-card h5 {
+            font-weight: 600; /* font-semibold */
+            color: #0369a1; /* sky-700 */
+        }
+         .info-card ul li {
+            color: #075985; /* sky-800 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-72 bg-white shadow-lg fixed top-0 left-0 h-full z-20 hidden lg:flex flex-col">
+            <div class="p-6 text-center border-b border-slate-200">
+                <img src="https://i.postimg.cc/4d0PH133/LOGO-01.png" alt="Logo Pademy" class="pademy-logo mx-auto mb-2">
+                <p class="text-sm text-slate-500">Nghiên cứu Khoa học</p>
+            </div>
+            <nav id="main-nav-desktop" class="flex-1 p-3 space-y-1 overflow-y-auto">
+                <a href="#tong-quan" class="nav-link block p-3 rounded-lg text-sm">I. Tổng quan NCKH</a>
+                <a href="#nen-tang-thiet-ke" class="nav-link block p-3 rounded-lg text-sm">II. Nền tảng & Thiết kế</a>
+                <a href="#viet-bai-bao" class="nav-link block p-3 rounded-lg text-sm">III. Viết Bài báo KH</a>
+                <a href="#nhan-de-chien-luoc" class="nav-link block p-3 rounded-lg text-sm">IV. Nhan đề & Công bố</a>
+                <a href="#quy-trinh-binh-duyet" class="nav-link block p-3 rounded-lg text-sm">V. Quy trình & Bình duyệt</a>
+                <a href="#cong-cu-ai" class="nav-link block p-3 rounded-lg text-sm">VI. Công cụ AI Research</a>
+                <a href="#dang-ky-khoa-hoc" class="nav-link block p-3 rounded-lg text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 focus:bg-amber-200">VII. Đăng ký Khóa học</a>
+            </nav>
+            <div class="p-4 border-t border-slate-200 contact-info text-slate-600 text-center">
+                <p class="font-semibold">Bùi Đăng Minh</p>
+                <p>0918888691</p>
+                <p>dangminhbui@pademy.vn</p>            
+            </div>
+        </aside>
+
+        <!-- Mobile Header & Burger Menu -->
+        <header class="lg:hidden w-full bg-white shadow-md p-4 flex justify-between items-center fixed top-0 z-30">
+             <img src="https://i.postimg.cc/4d0PH133/LOGO-01.png" alt="Logo Pademy" class="pademy-logo">
+            <button id="mobile-menu-button" class="p-2 text-slate-600 hover:text-sky-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </header>
+
+        <!-- Mobile Sidebar -->
+        <div id="mobile-sidebar" class="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-40 transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden flex flex-col">
+            <div class="p-6 text-center border-b border-slate-200 flex justify-between items-center">
+                <div>
+                    <img src="https://i.postimg.cc/4d0PH133/LOGO-01.png" alt="Logo Pademy" class="pademy-logo mx-auto mb-1">
+                    <p class="text-sm text-slate-500">Nghiên cứu Khoa học</p>
+                </div>
+                <button id="close-mobile-menu" class="p-2 self-start mt-1 text-slate-500 hover:text-sky-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <nav id="main-nav-mobile" class="flex-1 p-3 space-y-1 overflow-y-auto">
+                <a href="#tong-quan" class="nav-link block p-3 rounded-lg text-sm">I. Tổng quan NCKH</a>
+                <a href="#nen-tang-thiet-ke" class="nav-link block p-3 rounded-lg text-sm">II. Nền tảng & Thiết kế</a>
+                <a href="#viet-bai-bao" class="nav-link block p-3 rounded-lg text-sm">III. Viết Bài báo KH</a>
+                <a href="#nhan-de-chien-luoc" class="nav-link block p-3 rounded-lg text-sm">IV. Nhan đề & Công bố</a>
+                <a href="#quy-trinh-binh-duyet" class="nav-link block p-3 rounded-lg text-sm">V. Quy trình & Bình duyệt</a>
+                <a href="#cong-cu-ai" class="nav-link block p-3 rounded-lg text-sm">VI. Công cụ AI Research</a>
+                <a href="#dang-ky-khoa-hoc" class="nav-link block p-3 rounded-lg text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 focus:bg-amber-200">VII. Đăng ký Khóa học</a>
+            </nav>
+            <div class="p-4 border-t border-slate-200 contact-info text-slate-600 text-center">
+                <p class="font-semibold">Bùi Đăng Minh</p>
+                <p>0918888691</p>
+                <p>dangminhbui@pademy.vn</p>
+            </div>
+        </div>
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+        <!-- Main Content -->
+        <main class="lg:ml-72 flex-1 p-6 md:p-10 lg:p-12 mt-20 lg:mt-0">
+            <!-- Section I: TỔNG QUAN VỀ NGHIÊN CỨU KHOA HỌC -->
+            <section id="tong-quan" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-sky-700">I. TỔNG QUAN VỀ NGHIÊN CỨU KHOA HỌC</h2>
+                <p class="section-intro">Phần này đặt nền móng cho hiểu biết về nghiên cứu khoa học, từ những mục tiêu cốt lõi, phương pháp luận căn bản, đến việc nhận diện đúng bản chất và vai trò không thể thiếu của đạo đức trong mọi công trình khoa học.</p>
+
+                <div class="space-y-6" id="tong-quan-accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Mục tiêu của nghiên cứu khoa học</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div class="info-card">
+                                    <h5 class="text-md">Mở rộng tri thức hiện hành</h5>
+                                </div>
+                                <div class="info-card">
+                                    <h5 class="text-md">Sản sinh ra tri thức mới</h5>
+                                </div>
+                            </div>
+                            <h5 class="font-semibold text-slate-800 mb-2 text-md">Tri thức mới phải có tính:</h5>
+                            <div class="grid sm:grid-cols-3 gap-3">
+                                <div class="p-4 bg-white border border-slate-200 rounded-lg text-center shadow-sm">
+                                    <span class="text-3xl block mb-1">🌍</span>
+                                    <h6 class="font-semibold text-slate-700">Phổ quát</h6>
+                                    <p class="text-xs text-slate-500">(universal)</p>
+                                </div>
+                                <div class="p-4 bg-white border border-slate-200 rounded-lg text-center shadow-sm">
+                                    <span class="text-3xl block mb-1">📏</span>
+                                    <h6 class="font-semibold text-slate-700">Khái quát hóa</h6>
+                                    <p class="text-xs text-slate-500">(generalizable)</p>
+                                </div>
+                                <div class="p-4 bg-white border border-slate-200 rounded-lg text-center shadow-sm">
+                                    <span class="text-3xl block mb-1">🔁</span>
+                                    <h6 class="font-semibold text-slate-700">Tái thiết lập</h6>
+                                    <p class="text-xs text-slate-500">(reproducible)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Phương pháp khoa học (Scientific Method)</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <blockquote class="border-l-4 border-sky-500 p-3 bg-sky-50 text-sky-800 rounded-r-lg mb-4 text-sm italic">
+                                "Scientific method is a body of techniques for investigating phenomena, acquiring new knowledge, or correcting and integrating previous knowledge"
+                            </blockquote>
+                            <h5 class="font-semibold text-slate-800 mb-2 text-md">Là tập hợp các kỹ thuật để:</h5>
+                            <ul class="list-none space-y-2">
+                                <li class="flex items-center p-3 bg-white border border-slate-200 rounded-md shadow-sm"><span class="text-sky-600 mr-3 text-xl">🔎</span> Điều nghiên hiện tượng</li>
+                                <li class="flex items-center p-3 bg-white border border-slate-200 rounded-md shadow-sm"><span class="text-sky-600 mr-3 text-xl">💡</span> Thu thập tri thức mới</li>
+                                <li class="flex items-center p-3 bg-white border border-slate-200 rounded-md shadow-sm"><span class="text-sky-600 mr-3 text-xl">🔄</span> Chỉnh sửa và tổng hợp tri thức cũ</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Những gì không phải là nghiên cứu khoa học</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="grid md:grid-cols-2 gap-3">
+                               <li class="flex items-center p-3 bg-red-50 border border-red-200 text-red-700 rounded-md"><span class="mr-2 text-lg font-bold">✕</span> Báo cáo thường quy</li>
+                               <li class="flex items-center p-3 bg-red-50 border border-red-200 text-red-700 rounded-md"><span class="mr-2 text-lg font-bold">✕</span> Tổng kết phong trào/chủ trương/chính sách</li>
+                               <li class="flex items-center p-3 bg-red-50 border border-red-200 text-red-700 rounded-md"><span class="mr-2 text-lg font-bold">✕</span> Phân tích hành chính/kinh tế</li>
+                               <li class="flex items-center p-3 bg-red-50 border border-red-200 text-red-700 rounded-md"><span class="mr-2 text-lg font-bold">✕</span> Cải tiến hiệu suất cơ quan</li>
+                               <li class="flex items-center p-3 bg-red-50 border border-red-200 text-red-700 rounded-md"><span class="mr-2 text-lg font-bold">✕</span> Giảm chi phí sản xuất</li>
+                               <li class="flex items-center p-3 bg-red-50 border border-red-200 text-red-700 rounded-md"><span class="mr-2 text-lg font-bold">✕</span> V.V.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Vai trò của đạo đức nghiên cứu</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="grid md:grid-cols-2 gap-3">
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Ghi đúng tên tác giả</li>
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Không công bố kiểu “salami”</li>
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Tránh hành vi gian dối</li>
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Trích dẫn rõ ràng</li>
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Khai báo xung đột lợi ích</li>
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Không công bố trên tập san “dỏm”</li>
+                                <li class="flex items-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-md"><span class="mr-2 text-lg font-bold">✔</span> Chỉ nhận bình duyệt khi đủ tư cách</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 flex justify-end">
+                    <button class="bottom-nav-button next-section-btn">Trang sau <span class="ml-1">❯</span></button>
+                </div>
+            </section>
+
+            <!-- Section II: NỀN TẢNG VÀ THIẾT KẾ NGHIÊN CỨU -->
+            <section id="nen-tang-thiet-ke" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-sky-700">II. NỀN TẢNG VÀ THIẾT KẾ NGHIÊN CỨU</h2>
+                <p class="section-intro">Xây dựng một công trình nghiên cứu vững chắc đòi hỏi nền tảng kiến thức sâu rộng và một thiết kế nghiên cứu chặt chẽ. Phần này sẽ hướng dẫn bạn cách lựa chọn tài liệu tham khảo uy tín, các mô hình nghiên cứu phổ biến, cũng như cách đặt câu hỏi và chuẩn bị dữ liệu hiệu quả.</p>
+                
+                <div class="space-y-6" id="nen-tang-accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Tài liệu tham khảo chuẩn trong ngành</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="info-card">
+                                <h5 class="text-md">PubMed, các tập san quốc tế có bình duyệt:</h5>
+                                <ul class="list-disc pl-5 mb-3 space-y-1">
+                                    <li>Original papers</li>
+                                    <li>Review papers</li>
+                                    <li>Meta-analysis</li>
+                                </ul>
+                            </div>
+                            <div class="info-card">
+                                <h5 class="text-md">Các nguồn khác:</h5>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Sách chuyên khảo</li>
+                                    <li>Báo cáo từ tổ chức chuyên ngành</li>
+                                    <li>Bài của các tác giả nổi tiếng</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Mô hình nghiên cứu</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="p-4 border border-sky-200 rounded-lg bg-sky-50">
+                                    <h5 class="font-semibold text-sky-700 mb-2 text-lg">Mô tả (Descriptive):</h5>
+                                    <ul class="list-disc pl-5 space-y-1 text-slate-700">
+                                        <li>Case reports</li>
+                                        <li>Case series</li>
+                                        <li>Surveys</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 border border-teal-200 rounded-lg bg-teal-50">
+                                    <h5 class="font-semibold text-teal-700 mb-2 text-lg">Phân tích (Analytical):</h5>
+                                    <div class="pl-5">
+                                        <p class="font-medium text-slate-700 mb-1">Quan sát (Observational):</p>
+                                        <ul class="list-disc pl-5 mb-2 space-y-1 text-slate-600">
+                                            <li>Cắt ngang (cross-sectional)</li>
+                                            <li>Bệnh chứng (case-control)</li>
+                                            <li>Đoàn hệ (cohort)</li>
+                                        </ul>
+                                        <p class="font-medium text-slate-700 mb-1">Can thiệp (Interventional):</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                            <li>Thử nghiệm lâm sàng</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Xây dựng câu hỏi nghiên cứu</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                                <li class="p-2 bg-white border rounded-md">Câu hỏi cụ thể, có thể kiểm chứng</li>
+                                <li class="p-2 bg-white border rounded-md">Xác định biến số nghiên cứu</li>
+                                <li class="p-2 bg-white border rounded-md">Thiết kế phù hợp để trả lời câu hỏi</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Chuẩn bị dữ liệu và công cụ</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                             <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                                <li class="p-2 bg-white border rounded-md">Xác định loại dữ liệu cần thu thập</li>
+                                <li class="p-2 bg-white border rounded-md">Phương pháp thu thập</li>
+                                <li class="p-2 bg-white border rounded-md">Đảm bảo độ tin cậy và chính xác</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 flex justify-between">
+                    <button class="bottom-nav-button prev-section-btn"><span class="mr-1">❮</span> Trang trước</button>
+                    <button class="bottom-nav-button next-section-btn">Trang sau <span class="ml-1">❯</span></button>
+                </div>
+            </section>
+
+            <!-- Section III: VIẾT BÀI BÁO KHOA HỌC -->
+            <section id="viet-bai-bao" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-sky-700">III. VIẾT BÀI BÁO KHOA HỌC</h2>
+                <p class="section-intro">Viết bài báo khoa học là một nghệ thuật đòi hỏi sự chính xác, logic và khả năng truyền đạt thuyết phục. Phần này sẽ đi sâu vào cấu trúc của một bài báo xuất sắc, nguyên tắc viết hiệu quả, và cách xây dựng các phần quan trọng như Thảo luận và Tổng kết.</p>
+
+                <div class="space-y-6" id="viet-bai-bao-accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Cấu trúc bài báo tốt (Great Paper)</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-sky-100 rounded-lg border border-sky-300">
+                                    <h5 class="font-bold text-sky-700 mb-1 text-lg">🔬 Great Science:</h5>
+                                    <ul class="list-disc pl-5 text-slate-700">
+                                        <li>Original (Tính độc đáo)</li>
+                                        <li>Impact (Tầm ảnh hưởng)</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 bg-teal-100 rounded-lg border border-teal-300">
+                                    <h5 class="font-bold text-teal-700 mb-1 text-lg">📝 Great Presentation:</h5>
+                                    <ul class="list-disc pl-5 text-slate-700">
+                                        <li>Coherence (Mạch lạc, Logic)</li>
+                                        <li>Clarity (Rõ ràng)</li>
+                                        <li>Convincing (Thuyết phục)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Viết đoạn văn hiệu quả – Nguyên tắc IDEA</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="p-3 bg-white rounded-md shadow text-center border border-blue-300"><strong class="text-blue-600 text-2xl block mb-1">I</strong><span class="text-slate-700">dea: Ý chính</span></div>
+                                <div class="p-3 bg-white rounded-md shadow text-center border border-green-300"><strong class="text-green-600 text-2xl block mb-1">D</strong><span class="text-slate-700">ata: Dữ liệu hỗ trợ</span></div>
+                                <div class="p-3 bg-white rounded-md shadow text-center border border-purple-300"><strong class="text-purple-600 text-2xl block mb-1">E</strong><span class="text-slate-700">nglish: Ngôn ngữ chính xác</span></div>
+                                <div class="p-3 bg-white rounded-md shadow text-center border border-orange-300"><strong class="text-orange-600 text-2xl block mb-1">A</strong><span class="text-slate-700">rts: Cách trình bày hấp dẫn</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Viết phần Discussion</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                             <h5 class="font-semibold text-slate-800 mb-2 text-md">Trình tự logic:</h5>
+                             <ul class="list-decimal pl-5 space-y-1 text-slate-600 mb-4">
+                                <li>Trả lời câu hỏi ở phần Dẫn nhập</li>
+                                <li>Dữ liệu nhất quán với kết luận</li>
+                                <li>Bảo vệ kết luận và ghi nhận giới hạn</li>
+                                <li>Nhấn mạnh ý nghĩa nghiên cứu</li>
+                            </ul>
+                            <h5 class="font-semibold text-slate-800 mb-2 text-md">Công thức viết phần Discussion (6 phần):</h5>
+                             <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                <li>Tóm tắt lý do nghiên cứu & phát hiện chính</li>
+                                <li>So sánh với nghiên cứu trước</li>
+                                <li>Giải thích cơ chế liên quan</li>
+                                <li>Bàn về ứng dụng hoặc tính khái quát</li>
+                                <li>Nêu điểm mạnh và điểm yếu</li>
+                                <li>Kết luận</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Giải thích ý nghĩa phát hiện</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <p class="text-slate-700 mb-2 font-semibold">Phát hiện có ý nghĩa gì?</p>
+                            <p class="text-slate-700 mb-1">Có phải do:</p>
+                            <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                <li>Ngẫu nhiên?</li>
+                                <li>Bias (Thiên vị)?</li>
+                                <li>Confounding (Yếu tố gây nhiễu)?</li>
+                                <li>Effect → Cause (Nhầm lẫn Nhân-Quả ngược)?</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Viết phần tổng kết</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                <li>Bàn luận phát hiện chính và lý do quan trọng</li>
+                                <li>Điểm mạnh – yếu</li>
+                                <li>Đề xuất hướng giải thích khác</li>
+                                <li>Kết luận rõ ràng</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 flex justify-between">
+                    <button class="bottom-nav-button prev-section-btn"><span class="mr-1">❮</span> Trang trước</button>
+                    <button class="bottom-nav-button next-section-btn">Trang sau <span class="ml-1">❯</span></button>
+                </div>
+            </section>
+
+            <!-- Section IV: ĐẶT NHAN ĐỀ VÀ CHIẾN LƯỢC CÔNG BỐ -->
+            <section id="nhan-de-chien-luoc" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-sky-700">IV. ĐẶT NHAN ĐỀ VÀ CHIẾN LƯỢC CÔNG BỐ</h2>
+                <p class="section-intro">Nhan đề là cánh cửa đầu tiên dẫn người đọc đến công trình của bạn, trong khi chiến lược công bố thông minh sẽ quyết định tầm ảnh hưởng của nghiên cứu. Phần này cung cấp kiến thức toàn diện về cách tạo ra một nhan đề ấn tượng và các yếu tố cần cân nhắc khi công bố.</p>
+
+                <div class="space-y-6" id="nhan-de-accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Tầm quan trọng của nhan đề</span>
+                             <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                                <li class="p-2 bg-sky-50 border-l-4 border-sky-400">Là "câu đầu tiên" giao tiếp với độc giả.</li>
+                                <li class="p-2 bg-sky-50 border-l-4 border-sky-400">Thường là thứ duy nhất hầu hết mọi người sẽ đọc.</li>
+                                <li class="p-2 bg-sky-50 border-l-4 border-sky-400">Được sử dụng làm từ khóa để tìm kiếm trên thư viện và cơ sở dữ liệu.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="sub-section-title mb-4">Ba loại nhan đề</h3>
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <button class="title-type-btn active flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border" data-type="descriptive">Mô tả</button>
+                            <button class="title-type-btn flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border" data-type="declarative">Tuyên bố</button>
+                            <button class="title-type-btn flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border" data-type="interrogative">Nghi vấn</button>
+                        </div>
+                        <div id="title-example-area" class="p-4 bg-slate-100 rounded-md transition-all duration-300 min-h-[70px]">
+                            <!-- Content injected by JS -->
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Nguyên tắc đặt nhan đề</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                <li>Chuyển tải đúng nét chính</li>
+                                <li>Bắt đầu với từ quan trọng</li>
+                                <li>Nêu phương pháp</li>
+                                <li>Có từ khóa</li>
+                                <li>Có thông tin giá trị</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Lỗi phổ biến khi đặt nhan đề</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <ul class="space-y-1 text-slate-600">
+                                <li class="flex items-center"><span class="text-red-500 mr-2 text-xl">✕</span> Dài quá 20 chữ</li>
+                                <li class="flex items-center"><span class="text-red-500 mr-2 text-xl">✕</span> Quá chuyên biệt</li>
+                                <li class="flex items-center"><span class="text-red-500 mr-2 text-xl">✕</span> Thiếu từ khóa hoặc nội dung mới</li>
+                                <li class="flex items-center"><span class="text-red-500 mr-2 text-xl">✕</span> Viết tắt, dùng ngoặc đơn</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Dùng LLM để hỗ trợ đặt nhan đề</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="info-card">
+                                    <h5 class="text-md">Input:</h5>
+                                    <ul class="list-disc pl-5">
+                                        <li>File Word/PDF</li>
+                                        <li>Statement hoặc tóm tắt</li>
+                                        <li>Một nhan đề sẵn có</li>
+                                        <li>Prompt cụ thể</li>
+                                    </ul>
+                                </div>
+                                <div class="info-card">
+                                    <h5 class="text-md">Prompt ví dụ:</h5>
+                                    <ul class="list-disc pl-5">
+                                        <li>Give 10 titles for the following topic…</li>
+                                        <li>Provide 5 title suggestions…</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 flex justify-between">
+                    <button class="bottom-nav-button prev-section-btn"><span class="mr-1">❮</span> Trang trước</button>
+                    <button class="bottom-nav-button next-section-btn">Trang sau <span class="ml-1">❯</span></button>
+                </div>
+            </section>
+
+            <!-- Section V: QUY TRÌNH CÔNG BỐ VÀ BÌNH DUYỆT -->
+             <section id="quy-trinh-binh-duyet" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-sky-700">V. QUY TRÌNH CÔNG BỐ VÀ BÌNH DUYỆT</h2>
+                <p class="section-intro">Hành trình đưa một công trình nghiên cứu đến với cộng đồng khoa học bao gồm nhiều bước phức tạp, từ việc nộp bài cho tạp chí đến quá trình bình duyệt và xử lý các phản hồi. Hiểu rõ quy trình này và các vấn đề đạo đức liên quan là rất quan trọng.</p>
+
+                <div class="card p-6 mb-6">
+                    <h3 class="sub-section-title !border-b-0 mb-4 text-center">Trong “văn phòng” tập san</h3>
+                    <div class="relative mt-2">
+                        <div class="hidden md:block border-l-2 border-sky-300 absolute h-full top-0 left-1/2 transform -translate-x-1/2"></div>
+                        <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-8 items-start">
+                            <div class="timeline-item text-center md:text-left">
+                                <div class="timeline-dot md:left-1/2 md:-ml-[0.5625rem]"></div>
+                                <div class="bg-sky-100 p-3 rounded-lg shadow">
+                                    <p class="font-semibold text-sky-700">Bước 1</p>
+                                    <p class="text-sm text-slate-600">Tổng biên tập → Phó biên tập → 2–6 chuyên gia</p>
+                                </div>
+                            </div>
+                             <div class="timeline-item text-center md:text-left">
+                                <div class="timeline-dot md:left-1/2 md:-ml-[0.5625rem]"></div>
+                                 <div class="bg-sky-100 p-3 rounded-lg shadow">
+                                    <p class="font-semibold text-sky-700">Bước 2</p>
+                                    <p class="text-sm text-slate-600">Kết quả (1–3 tháng): Accept / Minor / Major / Reject</p>
+                                </div>
+                            </div>
+                             <div class="timeline-item text-center md:text-left">
+                                <div class="timeline-dot md:left-1/2 md:-ml-[0.5625rem]"></div>
+                                 <div class="bg-sky-100 p-3 rounded-lg shadow">
+                                    <p class="font-semibold text-sky-700">Bước 3</p>
+                                    <p class="text-sm text-slate-600">Tác giả sửa → Biên tập lại → In ấn</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-6" id="binh-duyet-accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Trả lời bình duyệt</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <p class="text-slate-700 mb-2">Peer-review là quy trình tốt nhất hiện nay.</p>
+                            <p class="text-slate-700 mb-3">Nhận biết bình duyệt không chuyên nghiệp.</p>
+                            <h5 class="font-semibold text-slate-800 mb-2 text-md">10 nguyên tắc trả lời:</h5>
+                             <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                <li>Đầy đủ – Lịch sự – Có chứng cứ – Rõ ràng</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Những sai phạm thường gặp</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="info-card !border-red-500 !bg-red-50">
+                                    <h5 class="!text-red-700 text-md">Về dữ liệu:</h5>
+                                    <ul class="!text-red-800">
+                                        <li>Ngụy tạo dữ liệu</li>
+                                        <li>Sở hữu dữ liệu không rõ ràng</li>
+                                    </ul>
+                                </div>
+                                <div class="info-card !border-red-500 !bg-red-50">
+                                    <h5 class="!text-red-700 text-md">Về tác quyền:</h5>
+                                    <ul class="!text-red-800">
+                                        <li>Đạo văn</li>
+                                        <li>Tự đạo văn</li>
+                                        <li>Tên tác giả không chính xác</li>
+                                    </ul>
+                                </div>
+                                <div class="info-card !border-red-500 !bg-red-50">
+                                    <h5 class="!text-red-700 text-md">Về đạo đức:</h5>
+                                    <ul class="!text-red-800">
+                                        <li>Phúc lợi động vật</li>
+                                        <li>Thiên vị người duyệt</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header sub-section-title w-full text-left flex justify-between items-center">
+                            <span>Ai có thể phát hiện sai phạm?</span>
+                            <span class="accordion-icon transition-transform transform text-sky-700 text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content hidden">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 text-center">
+                                <div class="p-3 bg-slate-100 rounded-lg shadow-sm"><span class="text-3xl block mb-1">👨‍⚖️</span><p class="text-xs font-medium text-slate-700">Biên tập viên</p></div>
+                                <div class="p-3 bg-slate-100 rounded-lg shadow-sm"><span class="text-3xl block mb-1">💻</span><p class="text-xs font-medium text-slate-700">Phần mềm</p></div>
+                                <div class="p-3 bg-slate-100 rounded-lg shadow-sm"><span class="text-3xl block mb-1">🤔</span><p class="text-xs font-medium text-slate-700">Chuyên gia</p></div>
+                                <div class="p-3 bg-slate-100 rounded-lg shadow-sm"><span class="text-3xl block mb-1">👥</span><p class="text-xs font-medium text-slate-700">Độc giả</p></div>
+                                <div class="p-3 bg-slate-100 rounded-lg shadow-sm"><span class="text-3xl block mb-1">🙋</span><p class="text-xs font-medium text-slate-700">Chính tác giả</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 flex justify-between">
+                    <button class="bottom-nav-button prev-section-btn"><span class="mr-1">❮</span> Trang trước</button>
+                    <button class="bottom-nav-button next-section-btn">Trang sau <span class="ml-1">❯</span></button>
+                </div>
+            </section>
+
+            <!-- Section: Công cụ AI Research (Existing, unchanged) -->
+            <section id="cong-cu-ai" class="content-section">
+                <h2 class="text-3xl font-bold mb-2 text-sky-700">VI. Hướng dẫn ứng dụng từng công cụ AI theo từng bước quy trình nghiên cứu</h2>
+                <p class="text-slate-600 mb-8 section-intro">Khám phá cách ứng dụng các công cụ AI hiệu quả cho từng giai đoạn cụ thể trong quy trình nghiên cứu khoa học của bạn.</p>
+
+                <div id="ai-steps-accordion" class="space-y-3">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>I. Bước 1: Xác định Research Gap & Tính mới</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>Perplexity:</strong> Tìm nhanh tài liệu gốc có DOI, trích dẫn rõ, cập nhật xu hướng.</li>
+                                <li><strong>Consensus:</strong> Tóm tắt kết quả từ các bài báo học thuật, xác định khoảng trống nghiên cứu.</li>
+                                <li><strong>Gemini:</strong> Gợi ý ý tưởng, tìm kiếm thông tin cập nhật trên web.</li>
+                                <li><strong>ChatGPT:</strong> Hỗ trợ brainstorming, đặt câu hỏi nghiên cứu, lên hướng đi.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>II. Bước 2: Lập dàn ý bài nghiên cứu (IMRaD)</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>ChatGPT:</strong> Lập dàn ý logic, chia nhỏ từng phần rõ ràng.</li>
+                                <li><strong>Paperpal:</strong> Tạo dàn ý học thuật theo mẫu IEEE hoặc custom prompt.</li>
+                                <li><strong>NotebookLM:</strong> Dựa trên tài liệu tải lên, tạo dàn ý phù hợp với nội dung cụ thể.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>III. Bước 3: Thiết kế nghiên cứu – Khảo sát, phương pháp, đối tượng</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>ChatGPT:</strong> Gợi ý biến, công cụ đo lường, bảng hỏi.</li>
+                                <li><strong>NotebookLM:</strong> Gợi ý từ dữ liệu tải lên, đảm bảo logic với tài liệu nền.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>IV. Bước 4: Ghi chú, lưu vết, tổ chức thông tin</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>NotebookLM:</strong> Lưu trữ tất cả câu hỏi, highlight, phản hồi.</li>
+                                <li><strong>Overleaf:</strong> Lưu vết quá trình soạn thảo học thuật, chia sẻ nhóm.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>V. Bước 5: Phân tích và trực quan hóa dữ liệu</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>ChatGPT:</strong> Phân tích mô tả, kiểm định cơ bản qua Python.</li>
+                                <li><strong>Julius AI:</strong> Đào sâu dữ liệu file, trực quan hóa rõ ràng.</li>
+                                <li><strong>Graphy:</strong> Tạo biểu đồ đẹp, đa dạng, phù hợp trình bày.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>VI. Bước 6: Viết bài (Introduction, Results, Discussion…)</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>ChatGPT:</strong> Viết mượt, chia đoạn rõ ràng.</li>
+                                <li><strong>Gemini:</strong> Viết phong cách kể chuyện, thân thiện.</li>
+                                <li><strong>NotebookLM:</strong> Viết dựa theo nội dung từ file tài liệu gốc.</li>
+                                <li><strong>Paperpal:</strong> Viết và chỉnh văn phong học thuật, kiểm tra ngữ pháp.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-sky-700 hover:bg-sky-50 transition-colors rounded-t-lg flex justify-between items-center">
+                            <span>VII. Bước 7: Checklist – Chuẩn hóa – Gửi bài</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200 hidden">
+                            <h5 class="text-md font-semibold text-slate-700 mb-2">Công cụ nên dùng:</h5>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                                <li><strong>Paperpal:</strong> Kiểm tra format, ngữ pháp, trích dẫn, gợi ý tạp chí.</li>
+                                <li><strong>ChatGPT:</strong> Tạo checklist theo chuẩn tạp chí (theo prompt).</li>
+                                <li><strong>Overleaf:</strong> Template chuẩn cho các tạp chí, định dạng đúng yêu cầu.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-6 border-t border-slate-200 bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-sky-700">VIII. Kết luận</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-700 mb-6">
+                        <li>Mỗi bước nên chọn công cụ chuyên biệt.</li>
+                        <li><strong>Combo đề xuất:</strong>
+                            <ul class="list-circle pl-5 mt-1 space-y-1 text-sm">
+                                <li>Bắt đầu: Perplexity + Consensus + ChatGPT</li>
+                                <li>Soạn bài: ChatGPT + Paperpal + NotebookLM</li>
+                                <li>Trực quan: Julius + Graphy</li>
+                                <li>Chuẩn hóa và nộp: Overleaf + Paperpal</li>
+                            </ul>
+                        </li>
+                        <li>Kết hợp khéo léo sẽ tối ưu hóa thời gian, độ chính xác và chất lượng bài nghiên cứu.</li>
+                    </ul>
+                    <p class="font-semibold text-sky-800">Hãy tận dụng thế mạnh của từng công cụ để nâng cao hiệu quả nghiên cứu!</p>
+                </div>
+                 <div class="mt-10 flex justify-between">
+                    <button class="bottom-nav-button prev-section-btn"><span class="mr-1">❮</span> Trang trước</button>
+                    <button class="bottom-nav-button next-section-btn">Trang sau <span class="ml-1">❯</span></button>
+                </div>
+            </section>
+            
+            <!-- Section: Đăng ký Khóa học -->
+            <section id="dang-ky-khoa-hoc" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-amber-600">VII. ĐĂNG KÝ KHÓA HỌC CHUYÊN SÂU</h2>
+                 <div class="bg-amber-50 p-6 md:p-8 rounded-lg shadow-lg border border-amber-300">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4 text-center">AI Giảng viên: Ứng dụng trong giảng dạy và nghiên cứu khoa học</h3>
+                    <p class="text-slate-700 mb-6 text-center text-lg">
+                        Nâng tầm kỹ năng sư phạm và năng lực nghiên cứu của bạn với khóa học chuyên sâu về ứng dụng Trí Tuệ Nhân Tạo.
+                    </p>
+                    <div class="text-center mb-6">
+                        <p class="text-slate-600 mb-1">Vui lòng liên hệ để biết thêm chi tiết và đăng ký:</p>
+                        <p class="text-xl font-semibold text-sky-700">Thầy Bùi Đăng Minh</p>
+                        <p class="text-lg text-slate-700">Điện thoại: <a href="tel:0918888691" class="hover:text-sky-600 underline">0918888691</a></p>
+                        <p class="text-lg text-slate-700">Email: <a href="mailto:dangminhbui@pademy.vn" class="hover:text-sky-600 underline">dangminhbui@pademy.vn</a></p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                        <a href="https://www.facebook.com/dangminhbui111" target="_blank" rel="noopener noreferrer" class="social-link facebook-link w-full sm:w-auto justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                            Facebook
+                        </a>
+                        <a href="https://www.youtube.com/@DangMinhBui111" target="_blank" rel="noopener noreferrer" class="social-link youtube-link w-full sm:w-auto justify-center">
+                           <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.411 0 5.825 0 12s.488 8.589 4.385 8.816c3.6.245 11.626.246 15.23 0C23.512 20.589 24 18.175 24 12s-.488-8.589-4.385-8.816zM9.75 15.6V8.4l6.3 3.6-6.3 3.6z" clip-rule="evenodd" /></svg>
+                            YouTube
+                        </a>
+                    </div>
+                </div>
+                 <div class="mt-10 flex justify-start">
+                    <button class="bottom-nav-button prev-section-btn"><span class="mr-1">❮</span> Trang trước</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinksDesktop = document.querySelectorAll('#main-nav-desktop .nav-link');
+            const navLinksMobile = document.querySelectorAll('#main-nav-mobile .nav-link');
+            const allNavLinks = [...navLinksDesktop, ...navLinksMobile];
+
+            const contentSections = document.querySelectorAll('.content-section');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+            const overlay = document.getElementById('overlay');
+            
+            const sectionOrder = Array.from(navLinksDesktop).map(link => link.getAttribute('href'));
+
+            function updateBottomNavButtons(currentHash) {
+                const currentIndex = sectionOrder.indexOf(currentHash);
+                document.querySelectorAll('.prev-section-btn').forEach(btn => {
+                    if (currentIndex > 0) {
+                        btn.disabled = false;
+                        btn.setAttribute('data-target', sectionOrder[currentIndex - 1]);
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+                        btn.classList.add('hover:bg-sky-600', 'bg-sky-500');
+                    } else {
+                        btn.disabled = true;
+                        btn.removeAttribute('data-target');
+                        btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+                        btn.classList.remove('hover:bg-sky-600', 'bg-sky-500');
+                    }
+                });
+                document.querySelectorAll('.next-section-btn').forEach(btn => {
+                    if (currentIndex < sectionOrder.length - 1) {
+                        btn.disabled = false;
+                        btn.setAttribute('data-target', sectionOrder[currentIndex + 1]);
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+                         btn.classList.add('hover:bg-sky-600', 'bg-sky-500');
+                    } else {
+                        btn.disabled = true;
+                        btn.removeAttribute('data-target');
+                        btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+                        btn.classList.remove('hover:bg-sky-600', 'bg-sky-500');
+                    }
+                });
+            }
+
+            function showSection(hash, isPopState = false) {
+                const defaultHash = sectionOrder[0] || '#tong-quan';
+                const targetHash = hash || defaultHash;
+
+                contentSections.forEach(section => {
+                    if ('#' + section.id === targetHash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                allNavLinks.forEach(link => {
+                    if (link.getAttribute('href') === targetHash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                updateBottomNavButtons(targetHash);
+                if (!isPopState) { // Avoid pushing state again on popstate
+                     history.pushState({path: targetHash}, '', targetHash);
+                }
+                window.scrollTo(0, 0);
+            }
+
+            function navigate(event) {
+                event.preventDefault();
+                let targetHash = event.currentTarget.getAttribute('href');
+                if (!targetHash) { 
+                    targetHash = event.currentTarget.getAttribute('data-target');
+                }
+                if (!targetHash) return;
+                showSection(targetHash);
+                
+                if(mobileSidebar.classList.contains('translate-x-0')) {
+                    toggleMobileMenu();
+                }
+            }
+            
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', navigate);
+            });
+
+            document.querySelectorAll('.prev-section-btn, .next-section-btn').forEach(button => {
+                button.addEventListener('click', navigate);
+            });
+
+            window.addEventListener('popstate', (event) => {
+                showSection(location.hash || sectionOrder[0] || '#tong-quan', true);
+            });
+
+            showSection(location.hash || sectionOrder[0] || '#tong-quan');
+
+            function toggleMobileMenu() {
+                const isOpen = mobileSidebar.classList.toggle('translate-x-0');
+                mobileSidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden', !isOpen);
+                document.body.classList.toggle('overflow-hidden', isOpen && window.innerWidth < 1024); // Prevent body scroll when mobile menu is open
+            }
+
+            mobileMenuButton.addEventListener('click', toggleMobileMenu);
+            closeMobileMenuButton.addEventListener('click', toggleMobileMenu);
+            overlay.addEventListener('click', toggleMobileMenu);
+            
+            const titleTypeBtns = document.querySelectorAll('.title-type-btn');
+            const titleExampleArea = document.getElementById('title-example-area');
+            const titleExamples = {
+                descriptive: { name: 'Mô tả', example: 'Genetics and the individualized assessment of fracture' },
+                declarative: { name: 'Tuyên bố', example: 'Mutation of PRX gene is associated with increased risk of death' },
+                interrogative: { name: 'Nghi vấn', example: 'Is estrogen bad for heart?' }
+            };
+            
+            function updateTitleExample(type = 'descriptive') {
+                 if (titleExampleArea && titleExamples[type]) {
+                    titleExampleArea.innerHTML = `
+                        <p class="font-semibold text-slate-800">${titleExamples[type].name}</p>
+                        <p class="text-slate-600 italic mt-1">"${titleExamples[type].example}"</p>
+                    `;
+                 }
+            }
+
+            titleTypeBtns.forEach(btn => {
+                if(btn.classList.contains('active')) {
+                     btn.classList.add('bg-sky-600', 'text-white', 'border-sky-600');
+                     btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-300', 'hover:bg-sky-50');
+                 } else {
+                     btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300', 'hover:bg-sky-50');
+                     btn.classList.remove('bg-sky-600', 'text-white', 'border-sky-600');
+                 }
+
+                btn.addEventListener('click', () => {
+                    titleTypeBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-sky-600', 'text-white', 'border-sky-600');
+                        b.classList.add('bg-white', 'text-slate-700', 'border-slate-300', 'hover:bg-sky-50');
+                    });
+                    btn.classList.add('active', 'bg-sky-600', 'text-white', 'border-sky-600');
+                    btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-300', 'hover:bg-sky-50');
+                    updateTitleExample(btn.dataset.type);
+                });
+            });
+            
+            if (titleTypeBtns.length > 0) {
+                const activeButton = document.querySelector('.title-type-btn.active');
+                if (activeButton && activeButton.dataset.type && titleExamples[activeButton.dataset.type]) {
+                    updateTitleExample(activeButton.dataset.type);
+                } else if (titleTypeBtns[0] && titleTypeBtns[0].dataset.type && titleExamples[titleTypeBtns[0].dataset.type]) {
+                     updateTitleExample(titleTypeBtns[0].dataset.type); 
+                } else {
+                    updateTitleExample(); 
+                }
+            }
+
+            function setupAccordion(accordionContainerId) {
+                const accordionContainer = document.getElementById(accordionContainerId);
+                if (!accordionContainer) {
+                    return;
+                }
+
+                const accordionItems = accordionContainer.querySelectorAll('.accordion-item');
+                accordionItems.forEach(item => {
+                    const header = item.querySelector('.accordion-header');
+                    const content = item.querySelector('.accordion-content');
+                    const icon = header ? header.querySelector('.accordion-icon') : null;
+                    
+                    if(header && content && icon){
+                        // Initial styling for header based on content visibility
+                        if (content.classList.contains('hidden')) {
+                            if (item.classList.contains('card')) {
+                                header.classList.add('no-border'); // Add no-border if content hidden for card
+                            } else {
+                                header.classList.add('rounded-lg'); // Full rounded if standalone and hidden
+                            }
+                        } else {
+                             if (item.classList.contains('card')) {
+                                header.classList.remove('no-border');
+                             } else {
+                                header.classList.add('rounded-t-lg');
+                                header.classList.remove('rounded-b-lg');
+                             }
+                        }
+
+
+                        header.addEventListener('click', () => {
+                            const isOpening = content.classList.contains('hidden');
+                            
+                            // Close others in the same group when opening one
+                            if (isOpening) { 
+                                accordionItems.forEach(otherItem => {
+                                    if (otherItem !== item && otherItem.parentElement.id === accordionContainerId) { 
+                                        const otherContent = otherItem.querySelector('.accordion-content');
+                                        const otherIcon = otherItem.querySelector('.accordion-header .accordion-icon');
+                                        const otherHeader = otherItem.querySelector('.accordion-header');
+
+                                        if(otherContent) otherContent.classList.add('hidden');
+                                        if(otherIcon) {
+                                            otherIcon.classList.remove('rotate-45');
+                                            otherIcon.textContent = '+';
+                                        }
+                                        if (otherHeader) {
+                                            if (otherItem.classList.contains('card')) {
+                                                otherHeader.classList.add('no-border');
+                                            } else {
+                                                otherHeader.classList.add('rounded-lg');
+                                                otherHeader.classList.remove('rounded-t-lg');
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            content.classList.toggle('hidden');
+                            icon.classList.toggle('rotate-45', isOpening);
+                            icon.textContent = isOpening ? '-' : '+';
+
+                            if (item.classList.contains('card')) {
+                                if(isOpening) { // Content is now visible
+                                    header.classList.remove('no-border');
+                                } else { // Content is now hidden
+                                    header.classList.add('no-border');
+                                }
+                            } else { // Standalone accordion
+                                if(isOpening) { 
+                                    header.classList.remove('rounded-lg');
+                                    header.classList.add('rounded-t-lg');
+                                } else { 
+                                    header.classList.add('rounded-lg');
+                                    header.classList.remove('rounded-t-lg');
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            
+            setupAccordion('tong-quan-accordion');
+            setupAccordion('nen-tang-accordion');
+            setupAccordion('viet-bai-bao-accordion');
+            setupAccordion('nhan-de-accordion');
+            setupAccordion('binh-duyet-accordion');
+            setupAccordion('ai-steps-accordion'); 
+
+        });
+    </script>
+</body>
+</html>
