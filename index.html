@@ -10,13 +10,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Scholarly Blue -->
-    <!-- Application Structure Plan: Ứng dụng được cấu trúc lại với các mục chính rõ ràng hơn, bám sát nội dung người dùng cung cấp. Thanh điều hướng bên cập nhật các mục mới, loại bỏ icon. Mỗi mục chính sẽ có phần giới thiệu và nội dung chi tiết được trình bày bằng text, danh sách, và các thành phần tương tác như accordion, card, layout cột để người dùng có thể khám phá từng phần nhỏ một cách trực quan hơn. Thêm thanh điều hướng cuối trang cho mỗi mục. Thêm mục "Đăng ký khóa học" với thông tin liên hệ và link mạng xã hội. -->
+    <!-- Application Structure Plan: Ứng dụng được cấu trúc lại với các mục chính rõ ràng hơn, bám sát nội dung người dùng cung cấp. Thanh điều hướng bên cập nhật các mục mới, loại bỏ icon. Mỗi mục chính sẽ có phần giới thiệu và nội dung chi tiết được trình bày bằng text, danh sách, và các thành phần tương tác như accordion, card, layout cột để người dùng có thể khám phá từng phần nhỏ một cách trực quan hơn. Thêm thanh điều hướng cuối trang cho mỗi mục. Thêm mục "Khóa học chuyên sâu" với thông tin liên hệ và link mạng xã hội. -->
     <!-- Visualization & Content Choices: 
         - Mục tiêu: Sắp xếp & Thông báo. Phương pháp: Sử dụng các khối văn bản, tiêu đề, danh sách có cấu trúc. Các mục con được nhóm trong accordion hoặc card để tăng tính tương tác và gọn gàng.
         - Mục tiêu: So sánh & Phân loại (Ba loại nhan đề). Phương pháp: Giữ nguyên cơ chế nút bấm tương tác.
         - Mục tiêu: Hiển thị Quy trình (Trong "văn phòng" tập san). Phương pháp: Giữ nguyên dạng timeline trực quan.
         - Mục tiêu: Điều hướng dễ dàng. Phương pháp: Thêm nút "Trang trước", "Trang sau" ở cuối mỗi section.
-        - Mục tiêu: Kêu gọi hành động. Phương pháp: Tạo section "Đăng ký khóa học" nổi bật.
+        - Mục tiêu: Kêu gọi hành động. Phương pháp: Tạo section "Khóa học chuyên sâu" nổi bật.
         - Toàn bộ ứng dụng được xây dựng mà không sử dụng SVG hay MermaidJS. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -190,7 +190,7 @@
                 <a href="#nhan-de-chien-luoc" class="nav-link block p-3 rounded-lg text-sm">IV. Nhan đề & Công bố</a>
                 <a href="#quy-trinh-binh-duyet" class="nav-link block p-3 rounded-lg text-sm">V. Quy trình & Bình duyệt</a>
                 <a href="#cong-cu-ai" class="nav-link block p-3 rounded-lg text-sm">VI. Công cụ AI Research</a>
-                <a href="#dang-ky-khoa-hoc" class="nav-link block p-3 rounded-lg text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 focus:bg-amber-200">VII. Đăng ký Khóa học</a>
+                <a href="#khoa-hoc-chuyen-sau" class="nav-link block p-3 rounded-lg text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 focus:bg-amber-200">VII. Khóa học chuyên sâu</a>
             </nav>
             <div class="p-4 border-t border-slate-200 contact-info text-slate-600 text-center">
                 <p class="font-semibold">Bùi Đăng Minh</p>
@@ -229,7 +229,7 @@
                 <a href="#nhan-de-chien-luoc" class="nav-link block p-3 rounded-lg text-sm">IV. Nhan đề & Công bố</a>
                 <a href="#quy-trinh-binh-duyet" class="nav-link block p-3 rounded-lg text-sm">V. Quy trình & Bình duyệt</a>
                 <a href="#cong-cu-ai" class="nav-link block p-3 rounded-lg text-sm">VI. Công cụ AI Research</a>
-                <a href="#dang-ky-khoa-hoc" class="nav-link block p-3 rounded-lg text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 focus:bg-amber-200">VII. Đăng ký Khóa học</a>
+                <a href="#khoa-hoc-chuyen-sau" class="nav-link block p-3 rounded-lg text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 focus:bg-amber-200">VII. Khóa học chuyên sâu</a>
             </nav>
             <div class="p-4 border-t border-slate-200 contact-info text-slate-600 text-center">
                 <p class="font-semibold">Bùi Đăng Minh</p>
@@ -879,9 +879,9 @@
                 </div>
             </section>
             
-            <!-- Section: Đăng ký Khóa học -->
-            <section id="dang-ky-khoa-hoc" class="content-section">
-                <h2 class="text-3xl font-bold mb-3 text-amber-600">VII. ĐĂNG KÝ KHÓA HỌC CHUYÊN SÂU</h2>
+            <!-- Section: Khóa học chuyên sâu -->
+            <section id="khoa-hoc-chuyen-sau" class="content-section">
+                <h2 class="text-3xl font-bold mb-3 text-amber-600">VII. KHÓA HỌC CHUYÊN SÂU</h2>
                  <div class="bg-amber-50 p-6 md:p-8 rounded-lg shadow-lg border border-amber-300">
                     <h3 class="text-2xl font-semibold text-amber-700 mb-4 text-center">AI Giảng viên: Ứng dụng trong giảng dạy và nghiên cứu khoa học</h3>
                     <p class="text-slate-700 mb-6 text-center text-lg">
@@ -977,7 +977,7 @@
                 });
                 
                 updateBottomNavButtons(targetHash);
-                if (!isPopState) { // Avoid pushing state again on popstate
+                if (!isPopState && history.state?.path !== targetHash) { 
                      history.pushState({path: targetHash}, '', targetHash);
                 }
                 window.scrollTo(0, 0);
@@ -1006,7 +1006,7 @@
             });
 
             window.addEventListener('popstate', (event) => {
-                showSection(location.hash || sectionOrder[0] || '#tong-quan', true);
+                 showSection(location.hash || sectionOrder[0] || '#tong-quan', true);
             });
 
             showSection(location.hash || sectionOrder[0] || '#tong-quan');
@@ -1015,7 +1015,7 @@
                 const isOpen = mobileSidebar.classList.toggle('translate-x-0');
                 mobileSidebar.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden', !isOpen);
-                document.body.classList.toggle('overflow-hidden', isOpen && window.innerWidth < 1024); // Prevent body scroll when mobile menu is open
+                document.body.classList.toggle('overflow-hidden', isOpen && window.innerWidth < 1024); 
             }
 
             mobileMenuButton.addEventListener('click', toggleMobileMenu);
@@ -1083,27 +1083,20 @@
                     const icon = header ? header.querySelector('.accordion-icon') : null;
                     
                     if(header && content && icon){
-                        // Initial styling for header based on content visibility
-                        if (content.classList.contains('hidden')) {
-                            if (item.classList.contains('card')) {
-                                header.classList.add('no-border'); // Add no-border if content hidden for card
-                            } else {
-                                header.classList.add('rounded-lg'); // Full rounded if standalone and hidden
-                            }
+                        // Determine if content is initially hidden to apply correct border styling
+                        const isContentHidden = content.classList.contains('hidden');
+                        if (item.classList.contains('card')) {
+                            header.classList.toggle('no-border', isContentHidden);
                         } else {
-                             if (item.classList.contains('card')) {
-                                header.classList.remove('no-border');
-                             } else {
-                                header.classList.add('rounded-t-lg');
-                                header.classList.remove('rounded-b-lg');
-                             }
+                             header.classList.toggle('rounded-lg', isContentHidden);
+                             header.classList.toggle('rounded-t-lg', !isContentHidden);
+                             header.classList.remove('rounded-b-lg', !isContentHidden);
                         }
 
 
                         header.addEventListener('click', () => {
                             const isOpening = content.classList.contains('hidden');
                             
-                            // Close others in the same group when opening one
                             if (isOpening) { 
                                 accordionItems.forEach(otherItem => {
                                     if (otherItem !== item && otherItem.parentElement.id === accordionContainerId) { 
@@ -1133,12 +1126,8 @@
                             icon.textContent = isOpening ? '-' : '+';
 
                             if (item.classList.contains('card')) {
-                                if(isOpening) { // Content is now visible
-                                    header.classList.remove('no-border');
-                                } else { // Content is now hidden
-                                    header.classList.add('no-border');
-                                }
-                            } else { // Standalone accordion
+                                header.classList.toggle('no-border', !isOpening);
+                            } else { 
                                 if(isOpening) { 
                                     header.classList.remove('rounded-lg');
                                     header.classList.add('rounded-t-lg');
